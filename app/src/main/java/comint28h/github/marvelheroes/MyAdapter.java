@@ -1,10 +1,10 @@
 package comint28h.github.marvelheroes;
 
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import java.util.List;
 
@@ -26,17 +26,17 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     //Create new views (invoked by the layout manager)
     @Override
     public MyAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                   int viewType){
-        //create a new view
-        TextView v = (TextView) LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.adapter_my, parent, false);
-        return new ViewHolder(v);
-    }
+        int viewType){
+            //create a new view
+            ImageView v = (ImageView) LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.adapter_my, parent, false);
+            return new ViewHolder(v);
+        }
 
-    //Replace the contents of a view (invoked by the layout manager)
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position){
-        holder.imageView.setImageIcon(mDataSet.get(position));
+        //Replace the contents of a view (invoked by the layout manager)
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position){
+            holder.imageView.setImageURI(Uri.parse(mDataSet.get(position).getImageURL()));
     }
 
     //Return the size of dataset
