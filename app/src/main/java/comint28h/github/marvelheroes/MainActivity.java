@@ -5,11 +5,14 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
 import java.util.List;
 
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -32,23 +35,34 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView = (RecyclerView)findViewById(R.id.my_recycler_view);
 
         //подсчет хеша для авторизации
-        byte[] bytesOfMessage = ("1" + "23adfa900e0ebcdc2c021f118af5c07b094be2e7" + APIService.API_KEY).getBytes();
+        String forHash = ("1" + APIService.API_KEY + "c91320537ce6d3be8c6ac1b579d52e3e");
         MessageDigest md = null;
         try {
             md = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {
             System.out.println("Все опять пошло по пизде");
         }
-        byte[] hash = md.digest(bytesOfMessage);
-
+        md.reset();
+        md.update(forHash.getBytes());
+        byte[] digest = md.digest();
+        BigInteger bigInt = new BigInteger(1, digest);
+        String hash = bigInt.toString(16);
+        while(hash.length() < 32){
+            hash = "0" + hash;
+        }
 
         //взаимодействие с удаленным сервером
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
+                .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         APIService apiService = retrofit.create(APIService.class);
-        Call<List<Hero>> call = apiService.getHeroesList("1", APIService.API_KEY, hash.toString());
+        Call<List<Hero>> call = apiService.getHeroesList("1", "c91320537ce6d3be8c6ac1b579d52e3e", hash);
         call.enqueue(new Callback<List<Hero>>() {
             @Override
             public void onResponse(Call<List<Hero>> call, Response<List<Hero>> response) {
