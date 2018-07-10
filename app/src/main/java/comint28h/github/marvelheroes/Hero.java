@@ -11,7 +11,7 @@ public class Hero {
         }
     }
 
-    private final String TYPE = "portrait_xlarge";
+    private final String TYPE = "/portrait_xlarge.";
 
     private int id;
     private Thumbnail thumbnail;
