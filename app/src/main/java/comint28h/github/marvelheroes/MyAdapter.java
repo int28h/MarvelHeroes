@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
@@ -42,5 +43,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     //Return the size of dataset
     public int getItemCount(){
         return mDataSet.size();
+    }
+
+    public void myDataSetChanges(List<Hero> myDataSet){
+        mDataSet.addAll(myDataSet);
+        notifyDataSetChanged();
     }
 }

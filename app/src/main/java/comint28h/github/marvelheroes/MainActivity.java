@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String BASE_URL = "https://gateway.marvel.com/";
 
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private MyAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
     @Override
@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<Hero>> call, Response<List<Hero>> response) {
                 myDataSet = response.body();
+                mAdapter.myDataSetChanges(myDataSet);
             }
 
             @Override
