@@ -10,29 +10,28 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import comint28h.github.marvelheroes.hero.Hero;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
-    private List<Hero> mDataSet = new LinkedList<>();
+    private List<Hero> heroesList;
     Context context;
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
         public TextView heroName;
-        public ImageView imageView;
+        public ImageView heroPortrait;
 
         public ViewHolder(View v){
             super(v);
             heroName = v.findViewById(R.id.heroName);
-            imageView = v.findViewById(R.id.portretsList);
+            heroPortrait = v.findViewById(R.id.heroPortrait);
         }
     }
 
     public MyAdapter(List<Hero> myDataSet, Context context){
-        mDataSet = myDataSet;
+        this.heroesList = new LinkedList<>(myDataSet);
         this.context = context;
     }
 
@@ -49,19 +48,19 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         //Replace the contents of a view (invoked by the layout manager)
         @Override
         public void onBindViewHolder(ViewHolder holder, int position){
-            Hero hero = mDataSet.get(position);
+            Hero hero = heroesList.get(position);
             holder.heroName.setText(hero.getName());
-            final String thumbnail = hero.getThumbnail().getPath().replace("http", "https") + "/standard_xlarge.jpg";
-            Picasso.with(context).load(thumbnail).into(holder.imageView);
+            final String thumbnail = hero.getThumbnail().getPath() + "/standard_xlarge.jpg";
+            Picasso.with(context).load(thumbnail).into(holder.heroPortrait);
     }
 
     //Return the size of dataset
     public int getItemCount(){
-        return mDataSet.size();
+        return heroesList.size();
     }
 
-    public void myDataSetChanges(List<Hero> myDataSet){
-        mDataSet.addAll(myDataSet);
+    public void addHeroesToHeroesList(List<Hero> myDataSet){
+        heroesList.addAll(myDataSet);
         notifyDataSetChanged();
     }
 }

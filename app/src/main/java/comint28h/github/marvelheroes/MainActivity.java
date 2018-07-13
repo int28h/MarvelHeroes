@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -24,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String BASE_URL = "https://gateway.marvel.com/";
     public static final String PUBLIC_API_KEY = "c91320537ce6d3be8c6ac1b579d52e3e";
 
-    private List<Hero> myDataSet = new LinkedList<>();
+    private List<Hero> heroesList = new LinkedList<>();
 
     private RecyclerView mRecyclerView;
     private MyAdapter mAdapter;
@@ -34,9 +35,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mRecyclerView = (RecyclerView)findViewById(R.id.my_recycler_view);
 
-        //linear layout manager
+        mRecyclerView = findViewById(R.id.my_recycler_view);
+        mRecyclerView.setVisibility(View.VISIBLE);
+        mRecyclerView.setHasFixedSize(true);
+
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
@@ -44,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         String forHash = ("1" + APIService.API_KEY + PUBLIC_API_KEY);
         String hash = new MD5Calc(forHash).getHash();
 
-        //взаимодействие с удаленным сервером + логирование запросов
+        //взаимодействие с удаленным сервером + логирование
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
@@ -56,9 +59,8 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         APIService apiService = retrofit.create(APIService.class);
 
-
         //адаптер
-        mAdapter = new MyAdapter(myDataSet, getApplicationContext());
+        mAdapter = new MyAdapter(heroesList, MainActivity.this);
         mRecyclerView.setAdapter(mAdapter);
 
         //обращение к серверу
@@ -66,9 +68,10 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<APIResponse>() {
             @Override
             public void onResponse(Call<APIResponse> call, Response<APIResponse> response) {
-                myDataSet = response.body().getData().getResults();
-                Log.w("Size", String.valueOf(myDataSet.size()));
-                mAdapter.myDataSetChanges(myDataSet);
+                heroesList.clear();
+                mAdapter.notifyDataSetChanged();
+                heroesList.addAll(response.body().getData().getResults());
+                mAdapter.addHeroesToHeroesList(heroesList);
             }
 
             @Override
