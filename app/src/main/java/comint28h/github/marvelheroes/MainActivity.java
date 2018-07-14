@@ -23,7 +23,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity {
     public static final String BASE_URL = "https://gateway.marvel.com/";
     public static final String PUBLIC_API_KEY = "c91320537ce6d3be8c6ac1b579d52e3e";
-    private int ts = 1;
 
     private List<Hero> heroesList = new LinkedList<>();
     private APIService apiService;
@@ -65,10 +64,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadHeroes(int offset){
+        Long tsLong = System.currentTimeMillis()/1000;
+        String ts = tsLong.toString();
         String forHash = (ts + APIService.API_KEY + PUBLIC_API_KEY);
         String hash = new MD5Calc(forHash).getHash();
-        Call<APIResponse> call = apiService.getHeroesList(offset, 20, String.valueOf(ts), "c91320537ce6d3be8c6ac1b579d52e3e", hash);
-        ts++;
+        Call<APIResponse> call = apiService.getHeroesList(offset, 20, ts, "c91320537ce6d3be8c6ac1b579d52e3e", hash);
         call.enqueue(callbackGetHeroesList);
     }
 
