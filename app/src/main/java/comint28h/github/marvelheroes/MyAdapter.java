@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import comint28h.github.marvelheroes.hero.Hero;
+import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     private List<Hero> heroesList;
@@ -51,7 +52,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             Hero hero = heroesList.get(position);
             holder.heroName.setText(hero.getName());
             final String thumbnail = hero.getThumbnail().getPath() + "/standard_xlarge.jpg";
-            Picasso.with(context).load(thumbnail).into(holder.heroPortrait);
+            Picasso.with(context).load(thumbnail).transform(new RoundedCornersTransformation(10, 10)).into(holder.heroPortrait);
     }
 
     //Return the size of dataset

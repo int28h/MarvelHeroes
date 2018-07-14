@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 
 import java.util.LinkedList;
@@ -24,12 +23,16 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity {
     public static final String BASE_URL = "https://gateway.marvel.com/";
     public static final String PUBLIC_API_KEY = "c91320537ce6d3be8c6ac1b579d52e3e";
+    private int ts = 1;
 
     private List<Hero> heroesList = new LinkedList<>();
+    private APIService apiService;
 
     private RecyclerView mRecyclerView;
     private MyAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private LinearLayoutManager mLayoutManager;
+    private int visible, previous, count;
+    private boolean loading = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,9 +46,9 @@ public class MainActivity extends AppCompatActivity {
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        //подсчет хеша для авторизации
-        String forHash = ("1" + APIService.API_KEY + PUBLIC_API_KEY);
-        String hash = new MD5Calc(forHash).getHash();
+        mAdapter = new MyAdapter(heroesList, MainActivity.this);
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.addOnScrollListener(onScrollListener);
 
         //взаимодействие с удаленным сервером + логирование
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
@@ -57,27 +60,47 @@ public class MainActivity extends AppCompatActivity {
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        APIService apiService = retrofit.create(APIService.class);
-
-        //адаптер
-        mAdapter = new MyAdapter(heroesList, MainActivity.this);
-        mRecyclerView.setAdapter(mAdapter);
-
-        //обращение к серверу
-        Call<APIResponse> call = apiService.getHeroesList("1", "c91320537ce6d3be8c6ac1b579d52e3e", hash);
-        call.enqueue(new Callback<APIResponse>() {
-            @Override
-            public void onResponse(Call<APIResponse> call, Response<APIResponse> response) {
-                heroesList.clear();
-                mAdapter.notifyDataSetChanged();
-                heroesList.addAll(response.body().getData().getResults());
-                mAdapter.addHeroesToHeroesList(heroesList);
-            }
-
-            @Override
-            public void onFailure(Call<APIResponse> call, Throwable t) {
-
-            }
-        });
+        apiService = retrofit.create(APIService.class);
+        loadHeroes(mAdapter.getItemCount());
     }
+
+    private void loadHeroes(int offset){
+        String forHash = (ts + APIService.API_KEY + PUBLIC_API_KEY);
+        String hash = new MD5Calc(forHash).getHash();
+        Call<APIResponse> call = apiService.getHeroesList(offset, 20, String.valueOf(ts), "c91320537ce6d3be8c6ac1b579d52e3e", hash);
+        ts++;
+        call.enqueue(callbackGetHeroesList);
+    }
+
+    private Callback<APIResponse> callbackGetHeroesList = new Callback<APIResponse>() {
+        @Override
+        public void onResponse(Call<APIResponse> call, Response<APIResponse> response) {
+            heroesList.clear();
+            mAdapter.notifyDataSetChanged();
+            heroesList.addAll(response.body().getData().getResults());
+            mAdapter.addHeroesToHeroesList(heroesList);
+            loading = true;
+        }
+
+        @Override
+        public void onFailure(Call<APIResponse> call, Throwable t) {
+
+        }
+    };
+
+    private RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            if(dy > 0) {
+                visible = mLayoutManager.getChildCount();
+                previous = mLayoutManager.findFirstVisibleItemPosition();
+                count = mLayoutManager.getItemCount();
+
+                if (loading && (visible + previous) >= count) {
+                    loading = false;
+                    loadHeroes(mAdapter.getItemCount());
+                }
+            }
+        }
+    };
 }
