@@ -1,15 +1,16 @@
 package comint28h.github.marvelheroes;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.GridLayout;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import comint28h.github.marvelheroes.hero.APIResponse;
 import comint28h.github.marvelheroes.hero.Hero;
@@ -32,8 +33,11 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private MyAdapter mAdapter;
     private GridLayoutManager mLayoutManager;
+
     private int visible, previous, count;
     private boolean loading = true;
+
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +45,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mRecyclerView = findViewById(R.id.my_recycler_view);
+
+        mSwipeRefreshLayout = findViewById(R.id.swipe_to_refresh);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadHeroes(mAdapter.getItemCount());
+                mSwipeRefreshLayout.setRefreshing(false);
+                }
+        });
+
         mRecyclerView.setVisibility(View.VISIBLE);
         mRecyclerView.setHasFixedSize(true);
 

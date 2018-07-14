@@ -31,7 +31,7 @@
             android:layout_marginBottom="10dp"
             android:layout_below="@id/heroPortrait"
             android:textSize="20dp"
-            android:textColor="#018e7e"
+            android:textColor="#FFFFFF"
             android:textStyle="bold"/>
     </RelativeLayout>
 </FrameLayout>
