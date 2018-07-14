@@ -2,9 +2,11 @@ package comint28h.github.marvelheroes;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.GridLayout;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
     private MyAdapter mAdapter;
-    private LinearLayoutManager mLayoutManager;
+    private GridLayoutManager mLayoutManager;
     private int visible, previous, count;
     private boolean loading = true;
 
@@ -42,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setVisibility(View.VISIBLE);
         mRecyclerView.setHasFixedSize(true);
 
-        mLayoutManager = new LinearLayoutManager(this);
+        mLayoutManager = new GridLayoutManager(this, 2);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         mAdapter = new MyAdapter(heroesList, MainActivity.this);
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         loadHeroes(mAdapter.getItemCount());
     }
 
+    //загрузка списка из n следующих героев
     private void loadHeroes(int offset){
         Long tsLong = System.currentTimeMillis()/1000;
         String ts = tsLong.toString();
@@ -72,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(callbackGetHeroesList);
     }
 
+    //парсинг отклика
     private Callback<APIResponse> callbackGetHeroesList = new Callback<APIResponse>() {
         @Override
         public void onResponse(Call<APIResponse> call, Response<APIResponse> response) {
@@ -88,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    //пагинация
     private RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
         @Override
         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
