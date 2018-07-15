@@ -9,7 +9,7 @@ import com.squareup.picasso.Picasso;
 
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
-public class HeroInfo extends AppCompatActivity {
+public class HeroActivity extends AppCompatActivity {
     ImageView thumbnail;
     TextView name;
     TextView description;
@@ -19,7 +19,7 @@ public class HeroInfo extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.hero_info);
+        setContentView(R.layout.hero_activity);
         
         loadHeroInfo();
     }

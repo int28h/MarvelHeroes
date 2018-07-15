@@ -1,4 +1,6 @@
-package comint28h.github.marvelheroes.hero;
+package comint28h.github.marvelheroes.network;
+
+import comint28h.github.marvelheroes.model.Data;
 
 public class APIResponse {
     String code;

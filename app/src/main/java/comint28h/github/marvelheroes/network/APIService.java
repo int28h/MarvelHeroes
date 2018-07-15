@@ -1,6 +1,7 @@
-package comint28h.github.marvelheroes;
+package comint28h.github.marvelheroes.network;
 
-import comint28h.github.marvelheroes.hero.APIResponse;
+import comint28h.github.marvelheroes.BuildConfig;
+import comint28h.github.marvelheroes.network.APIResponse;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;

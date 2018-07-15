@@ -1,4 +1,4 @@
-package comint28h.github.marvelheroes;
+package comint28h.github.marvelheroes.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,13 +14,19 @@ import com.squareup.picasso.Picasso;
 import java.util.LinkedList;
 import java.util.List;
 
-import comint28h.github.marvelheroes.hero.Hero;
-import comint28h.github.marvelheroes.hero.Items;
+import comint28h.github.marvelheroes.HeroActivity;
+import comint28h.github.marvelheroes.R;
+import comint28h.github.marvelheroes.model.Hero;
+import comint28h.github.marvelheroes.model.Items;
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
-    private List<Hero> heroesList;
+public class HeroAdapter extends RecyclerView.Adapter<HeroAdapter.ViewHolder> {
+    private List<Hero> heroesList = new LinkedList<>();
     Context context;
+
+    public void clear() {
+        this.heroesList.clear();
+    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
         public TextView heroName;
@@ -33,18 +39,17 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         }
     }
 
-    public MyAdapter(List<Hero> myDataSet, Context context){
-        this.heroesList = new LinkedList<>(myDataSet);
+    public HeroAdapter(Context context){
         this.context = context;
     }
 
     //Create new views (invoked by the layout manager)
     @Override
-    public MyAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
-        int viewType){
+    public HeroAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
+                                                     int viewType){
             //create a new view
             View v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.adapter_my, parent, false);
+                    .inflate(R.layout.hero_adapter, parent, false);
             return new ViewHolder(v);
         }
 
@@ -61,7 +66,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             holder.heroPortrait.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(context, HeroInfo.class);
+                    Intent intent = new Intent(context, HeroActivity.class);
                     intent.putExtra("name", heroesList.get(position).getName());
                     intent.putExtra("description", heroesList.get(position).getDescription());
 
@@ -85,7 +90,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         return heroesList.size();
     }
 
-    public void addHeroesToHeroesList(List<Hero> myDataSet){
+    public void addAll(List<Hero> myDataSet){
         heroesList.addAll(myDataSet);
         notifyDataSetChanged();
     }
@@ -93,7 +98,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     private String buildList(List <Items> items){
         StringBuilder result = new StringBuilder();
         for(Items item : items){
-            result.append(item.getName() + "\n");
+            result.append(item.getName()).append('\n');
         }
         return result.toString();
     }

@@ -1,19 +1,15 @@
 package comint28h.github.marvelheroes;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-
-import comint28h.github.marvelheroes.hero.APIResponse;
-import comint28h.github.marvelheroes.hero.Hero;
+import comint28h.github.marvelheroes.adapter.HeroAdapter;
+import comint28h.github.marvelheroes.network.APIResponse;
+import comint28h.github.marvelheroes.network.APIService;
 import comint28h.github.marvelheroes.utils.MD5Calc;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -27,43 +23,43 @@ public class MainActivity extends AppCompatActivity {
     public static final String BASE_URL = "https://gateway.marvel.com/";
     public static final String PUBLIC_API_KEY = "c91320537ce6d3be8c6ac1b579d52e3e";
 
-    private List<Hero> heroesList = new LinkedList<>();
     private APIService apiService;
 
-    private RecyclerView mRecyclerView;
-    private MyAdapter mAdapter;
+    private RecyclerView recyclerView;
+    private HeroAdapter heroAdapter;
     private GridLayoutManager mLayoutManager;
 
     private int visible, previous, count;
     private boolean loading = true;
 
-    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mRecyclerView = findViewById(R.id.my_recycler_view);
+        recyclerView = findViewById(R.id.my_recycler_view);
 
-        mSwipeRefreshLayout = findViewById(R.id.swipe_to_refresh);
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        swipeRefreshLayout = findViewById(R.id.swipe_to_refresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                loadHeroes(mAdapter.getItemCount());
-                mSwipeRefreshLayout.setRefreshing(false);
-                }
+                heroAdapter.clear();
+                loadHeroes(0);
+                swipeRefreshLayout.setRefreshing(false);
+            }
         });
 
-        mRecyclerView.setVisibility(View.VISIBLE);
-        mRecyclerView.setHasFixedSize(true);
+        recyclerView.setVisibility(View.VISIBLE);
+        recyclerView.setHasFixedSize(true);
 
         mLayoutManager = new GridLayoutManager(this, 2);
-        mRecyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new MyAdapter(heroesList, MainActivity.this);
-        mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addOnScrollListener(onScrollListener);
+        heroAdapter = new HeroAdapter(MainActivity.this);
+        recyclerView.setAdapter(heroAdapter);
+        recyclerView.addOnScrollListener(onScrollListener);
 
         //взаимодействие с удаленным сервером + логирование
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
@@ -76,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         apiService = retrofit.create(APIService.class);
-        loadHeroes(mAdapter.getItemCount());
+        loadHeroes(heroAdapter.getItemCount());
     }
 
     //загрузка списка из n следующих героев
@@ -93,10 +89,7 @@ public class MainActivity extends AppCompatActivity {
     private Callback<APIResponse> callbackGetHeroesList = new Callback<APIResponse>() {
         @Override
         public void onResponse(Call<APIResponse> call, Response<APIResponse> response) {
-            heroesList.clear();
-            mAdapter.notifyDataSetChanged();
-            heroesList.addAll(response.body().getData().getResults());
-            mAdapter.addHeroesToHeroesList(heroesList);
+            heroAdapter.addAll(response.body().getData().getResults());
             loading = true;
         }
 
@@ -117,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (loading && (visible + previous) >= count) {
                     loading = false;
-                    loadHeroes(mAdapter.getItemCount());
+                    loadHeroes(heroAdapter.getItemCount());
                 }
             }
         }
