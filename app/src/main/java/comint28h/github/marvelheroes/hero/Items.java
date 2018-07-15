@@ -1,6 +1,6 @@
 package comint28h.github.marvelheroes.hero;
 
-class Items {
+public class Items {
     String name;
 
     public String getName() {

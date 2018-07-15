@@ -2,7 +2,7 @@ package comint28h.github.marvelheroes.hero;
 
 import java.util.List;
 
-class Series {
+public class Series {
     List<Items> items;
 
     public Series(List<Items> items) {

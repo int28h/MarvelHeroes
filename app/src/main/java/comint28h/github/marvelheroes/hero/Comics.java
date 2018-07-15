@@ -2,7 +2,7 @@ package comint28h.github.marvelheroes.hero;
 
 import java.util.List;
 
-class Comics {
+public class Comics {
     List<Items> items;
 
     public Comics(List<Items> items) {
